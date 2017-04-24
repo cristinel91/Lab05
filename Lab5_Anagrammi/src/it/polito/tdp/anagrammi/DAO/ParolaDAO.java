@@ -1,31 +1,44 @@
 package it.polito.tdp.anagrammi.DAO;
-import java.sql.*;
-import java.util.*;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 
 public class ParolaDAO {
-	
-	public List<String> getParole() {
 
-		final String sql = "SELECT nome FROM parola";
+	public boolean isCorrect(String anagramma){
 
-		List<String>parole = new LinkedList<String>();
-
+		String sql = 
+				"SELECT nome " +
+				"FROM parola " +
+				"WHERE nome=?" ;
+		
+		boolean result;
+		
 		try {
 			Connection conn = ConnectDB.getConnection();
-			PreparedStatement st = conn.prepareStatement(sql);
-
-			ResultSet rs = st.executeQuery();
-
-			while (rs.next()) {
-				parole.add(new String(rs.getString("nome")));
+			
+			PreparedStatement st = conn.prepareStatement(sql) ;
+			
+			st.setString(1, anagramma);
+			
+			ResultSet res = st.executeQuery() ;
+			
+			if(res.next()) {
+				result = true;
+				
+			} else {
+				result = false;
 			}
-
-			return parole;
-
+			
+			conn.close();
+			return result ;
+			
 		} catch (SQLException e) {
-			// e.printStackTrace();
-			throw new RuntimeException("Errore Db");
+			e.printStackTrace();
+			return false ;
 		}
 	}
-
 }
